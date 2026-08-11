@@ -1,0 +1,3 @@
+<?php $this->load->view('frontend/partials/header'); ?>
+<main class="page-wrap"><header class="page-hero"><p class="eyebrow">Trust Documents</p><h1>Certificates</h1></header><div class="cards"><?php foreach ($certificates as $c): ?><article><?php if ($c->thumbnail): ?><img src="<?= upload_url($c->thumbnail) ?>" alt="<?= e($c->title) ?>"><?php endif; ?><h3><?= e($c->title) ?></h3><p><?= e($c->description) ?></p><small><?= e($c->issue_date) ?> <?= $c->expiry_date ? 'to '.e($c->expiry_date) : '' ?></small><?php if ($c->download_enabled): ?><a class="btn small" href="<?= upload_url($c->file_path) ?>" download>Download</a><?php endif; ?></article><?php endforeach; ?></div></main>
+<?php $this->load->view('frontend/partials/footer'); ?>
