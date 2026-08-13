@@ -18,30 +18,35 @@ class Image_optimizer {
 		$target = rtrim($dir, '/').'/'.$name.'.avif';
 
 		if (class_exists('Imagick') && in_array('AVIF', Imagick::queryFormats('AVIF'), TRUE)) {
-			$image = new Imagick($tmp);
-			$image->autoOrient();
-			$image->thumbnailImage($max_w, $max_h, TRUE, TRUE);
-			$image->setImageFormat('AVIF');
-			$image->setImageCompressionQuality(72);
-			$image->writeImage(FCPATH.$target);
-			$image->clear();
-			return array('path' => $target);
+			try {
+				$image = new Imagick($tmp);
+				$image->autoOrient();
+				$image->thumbnailImage($max_w, $max_h, TRUE, TRUE);
+				$image->setImageFormat('AVIF');
+				$image->setImageCompressionQuality(72);
+				$image->writeImage(FCPATH.$target);
+				$image->clear();
+				if (is_file(FCPATH.$target) && filesize(FCPATH.$target) > 0) return array('path' => $target);
+			} catch (Exception $e) {
+				if (isset($image) && $image instanceof Imagick) $image->clear();
+			}
 		}
 
 		if (function_exists('imageavif')) {
 			$src = $this->gd_create($tmp, $mime);
-			if (!$src) return array('error' => 'Could not read uploaded image.');
-			$w = imagesx($src); $h = imagesy($src);
-			$scale = min($max_w / $w, $max_h / $h, 1);
-			$nw = (int) floor($w * $scale); $nh = (int) floor($h * $scale);
-			$dst = imagecreatetruecolor($nw, $nh);
-			imagealphablending($dst, FALSE); imagesavealpha($dst, TRUE);
-			imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
-			imageavif($dst, FCPATH.$target, 72);
-			imagedestroy($src); imagedestroy($dst);
-			return array('path' => $target);
+			if ($src) {
+				$w = imagesx($src); $h = imagesy($src);
+				$scale = min($max_w / $w, $max_h / $h, 1);
+				$nw = (int) floor($w * $scale); $nh = (int) floor($h * $scale);
+				$dst = imagecreatetruecolor($nw, $nh);
+				imagealphablending($dst, FALSE); imagesavealpha($dst, TRUE);
+				imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+				$saved = imageavif($dst, FCPATH.$target, 72);
+				imagedestroy($src); imagedestroy($dst);
+				if ($saved && is_file(FCPATH.$target) && filesize(FCPATH.$target) > 0) return array('path' => $target);
+			}
 		}
-		return array('error' => 'Server cannot create AVIF images. Enable Imagick AVIF or PHP GD imageavif().');
+		return $this->save_original($field, $dir, $name, $mime);
 	}
 
 	public function pdf($field, $dir)
@@ -62,5 +67,19 @@ class Image_optimizer {
 		if ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) return imagecreatefromwebp($tmp);
 		if ($mime === 'image/avif' && function_exists('imagecreatefromavif')) return imagecreatefromavif($tmp);
 		return FALSE;
+	}
+
+	private function save_original($field, $dir, $name, $mime)
+	{
+		$extensions = array(
+			'image/jpeg' => 'jpg',
+			'image/png' => 'png',
+			'image/webp' => 'webp',
+			'image/avif' => 'avif',
+		);
+		if (empty($extensions[$mime])) return array('error' => 'Only JPG, PNG, WebP, or AVIF images are allowed.');
+
+		$target = rtrim($dir, '/').'/'.$name.'.'.$extensions[$mime];
+		return move_uploaded_file($_FILES[$field]['tmp_name'], FCPATH.$target) ? array('path' => $target) : array('error' => 'Could not save uploaded image.');
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 $fields = array(
-	'shop_name','tagline','establishment_year','short_description','email','phone','alternate_phone','whatsapp',
+	'shop_name','tagline','establishment_year','short_description','shop_full_description','email','phone','alternate_phone','whatsapp',
 	'address','business_hours','gst_number','bis_details','maps_embed','maps_url','android_url','ios_url',
 	'app_heading','app_short_description','facebook','instagram','youtube','linkedin','twitter','pinterest',
 	'meta_title','meta_description','canonical_base_url','announcement_text','announcement_link',
@@ -23,6 +23,7 @@ $color_fields = array(
 	<div class="form-grid">
 		<?php foreach ($fields as $f): ?>
 			<?php $value = $settings[$f] ?? ($color_fields[$f] ?? ''); ?>
+			<?php if ($f === 'maps_embed') $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>
 			<label>
 				<?= ucwords(str_replace('_', ' ', $f)) ?>
 				<?php if (isset($color_fields[$f])): ?>
@@ -42,6 +43,7 @@ $color_fields = array(
 		<label>Android Enabled<select name="android_enabled"><option value="1">1</option><option value="0" <?= (($settings['android_enabled'] ?? '') === '0') ? 'selected' : '' ?>>0</option></select></label>
 		<label>iOS Enabled<select name="ios_enabled"><option value="1">1</option><option value="0" <?= (($settings['ios_enabled'] ?? '') === '0') ? 'selected' : '' ?>>0</option></select></label>
 		<label>Logo<input type="file" name="logo" accept="image/*"></label>
+		<label>Full Logo<input type="file" name="full_logo" accept="image/*"></label>
 		<label>App Promotional Image<input type="file" name="app_image" accept="image/*"></label>
 		<label>Android QR<input type="file" name="android_qr" accept="image/*"></label>
 		<label>iOS QR<input type="file" name="ios_qr" accept="image/*"></label>

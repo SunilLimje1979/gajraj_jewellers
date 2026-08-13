@@ -1,6 +1,6 @@
 <section id="download" class="final-cta">
-	<h2>Start your gold-saving journey with our official mobile app.</h2>
-	<p><?= e($settings['app_short_description'] ?? 'Track installments, receipts, maturity progress, and shop updates in one secure place.') ?>
+	<h2>Buy gold anytime, 24/7 with our official mobile app.</h2>
+	<p><?= e($settings['app_short_description'] ?? 'Buy gold of any value, track grams credited to your wallet, view transactions, and request withdrawal securely.') ?>
 	</p>
 	<div class="actions">
 		<?php if (($settings['android_enabled'] ?? '1') === '1'): ?><a class="store"
