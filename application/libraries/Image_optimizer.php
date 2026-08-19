@@ -60,6 +60,41 @@ class Image_optimizer {
 		return move_uploaded_file($_FILES[$field]['tmp_name'], FCPATH.$target) ? array('path' => $target) : array('error' => 'Could not save PDF.');
 	}
 
+	public function icon($field, $dir)
+	{
+		if (empty($_FILES[$field]['name'])) return array('path' => '');
+		if ($_FILES[$field]['size'] > 2 * 1024 * 1024) return array('error' => 'Icon must be 2MB or less.');
+
+		$tmp = $_FILES[$field]['tmp_name'];
+		$mime = function_exists('mime_content_type') ? mime_content_type($tmp) : $_FILES[$field]['type'];
+		$ext = strtolower(pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION));
+		$allowed = array(
+			'image/png' => 'png',
+			'image/svg+xml' => 'svg',
+			'image/x-icon' => 'ico',
+			'image/x-ico' => 'ico',
+			'image/vnd.microsoft.icon' => 'ico',
+		);
+
+		if ($ext === 'svg') {
+			$svg = file_get_contents($tmp);
+			if (!preg_match('/<svg\b/i', $svg) || preg_match('/<script\b|on\w+\s*=|javascript:/i', $svg)) {
+				return array('error' => 'SVG icon is invalid or unsafe.');
+			}
+			$save_ext = 'svg';
+		} elseif ($ext === 'png' && $mime === 'image/png' && @getimagesize($tmp)) {
+			$save_ext = 'png';
+		} elseif ($ext === 'ico' && (isset($allowed[$mime]) || @getimagesize($tmp))) {
+			$save_ext = 'ico';
+		} else {
+			return array('error' => 'Only PNG, SVG, or ICO icons are allowed.');
+		}
+
+		if (!is_dir(FCPATH.$dir)) mkdir(FCPATH.$dir, 0755, TRUE);
+		$target = rtrim($dir, '/').'/'.bin2hex(random_bytes(16)).'.'.$save_ext;
+		return move_uploaded_file($tmp, FCPATH.$target) ? array('path' => $target) : array('error' => 'Could not save uploaded icon.');
+	}
+
 	private function gd_create($tmp, $mime)
 	{
 		if ($mime === 'image/jpeg') return imagecreatefromjpeg($tmp);

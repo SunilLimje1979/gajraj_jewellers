@@ -6,7 +6,11 @@ class Settings extends Admin_Controller {
 	{
 		if ($this->input->method() === 'post') {
 			$allowed_colors = array('primary_color','secondary_color','accent_color','heading_color','text_color','footer_color','announcement_bg','announcement_text_color');
+			$rich_fields = array('shop_full_description','app_feature_points');
 			$data = $this->input->post(NULL, TRUE);
+			foreach ($rich_fields as $field) {
+				$data[$field] = clean_rich_html($this->input->post($field, FALSE));
+			}
 			$data['maps_embed'] = safe_maps_embed($this->input->post('maps_embed', FALSE));
 			unset($data[$this->security->get_csrf_token_name()]);
 			foreach ($allowed_colors as $c) {

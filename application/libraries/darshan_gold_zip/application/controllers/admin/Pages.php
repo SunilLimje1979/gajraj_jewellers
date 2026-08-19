@@ -1,0 +1,3 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+require_once APPPATH.'controllers/admin/Crud_admin.php';
+class Pages extends Crud_admin { protected $table='pages'; protected $title='Pages and Policies'; protected $upload_dir='uploads/pages'; protected $fields=array('title'=>array('type'=>'text'),'slug'=>array('type'=>'text'),'content'=>array('type'=>'html'),'meta_title'=>array('type'=>'text'),'meta_description'=>array('type'=>'textarea'),'featured_image'=>array('type'=>'image','max_w'=>1400,'max_h'=>900),'show_in_footer'=>array('type'=>'select','options'=>array('1','0')),'sort_order'=>array('type'=>'number'),'status'=>array('type'=>'select','options'=>array('active','draft'))); }

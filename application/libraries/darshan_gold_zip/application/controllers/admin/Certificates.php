@@ -1,0 +1,3 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+require_once APPPATH.'controllers/admin/Crud_admin.php';
+class Certificates extends Crud_admin { protected $table='certificates'; protected $title='Certificates'; protected $upload_dir='uploads/certificates'; protected $fields=array('title'=>array('type'=>'text'),'certificate_type'=>array('type'=>'text'),'description'=>array('type'=>'textarea'),'thumbnail'=>array('type'=>'image','max_w'=>800,'max_h'=>1000),'file_path'=>array('type'=>'file'),'issue_date'=>array('type'=>'date'),'expiry_date'=>array('type'=>'date'),'download_enabled'=>array('type'=>'select','options'=>array('1','0')),'sort_order'=>array('type'=>'number'),'status'=>array('type'=>'select','options'=>array('active','inactive'))); }

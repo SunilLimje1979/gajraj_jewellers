@@ -28,8 +28,8 @@ class Crud_admin extends Admin_Controller {
 		if ($this->input->method() === 'post') {
 			$data = array();
 			foreach ($this->fields as $name => $meta) {
-				if (in_array($meta['type'], array('image','file'), TRUE)) continue;
-				$data[$name] = $this->input->post($name, $meta['type'] !== 'html');
+				if (in_array($meta['type'], array('image','file','icon'), TRUE)) continue;
+				$data[$name] = $meta['type'] === 'html' ? clean_rich_html($this->input->post($name, FALSE)) : $this->input->post($name, TRUE);
 			}
 			if (isset($data['title']) && isset($this->fields['slug']) && empty($data['slug'])) $data['slug'] = gold_slug($data['title']);
 			if (isset($data['name']) && isset($this->fields['slug']) && empty($data['slug'])) $data['slug'] = gold_slug($data['name']);
@@ -41,6 +41,11 @@ class Crud_admin extends Admin_Controller {
 				}
 				if ($meta['type'] === 'file') {
 					$file = $this->image_optimizer->pdf($name, $this->upload_dir);
+					if (!empty($file['path'])) $data[$name] = $file['path'];
+					if (!empty($file['error'])) $this->session->set_flashdata('error', $file['error']);
+				}
+				if ($meta['type'] === 'icon') {
+					$file = $this->image_optimizer->icon($name, $this->upload_dir);
 					if (!empty($file['path'])) $data[$name] = $file['path'];
 					if (!empty($file['error'])) $this->session->set_flashdata('error', $file['error']);
 				}

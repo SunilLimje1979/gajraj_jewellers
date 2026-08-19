@@ -327,6 +327,31 @@ button:hover {
   margin-bottom: 18px;
 }
 
+.settings-form {
+  display: grid;
+  gap: 24px;
+}
+
+.settings-section {
+  padding-top: 22px;
+  border-top: 1px solid var(--admin-border);
+}
+
+.settings-section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-section header {
+  margin-bottom: 14px;
+}
+
+.settings-section h2 {
+  margin: 0;
+  color: var(--admin-primary);
+  font-size: 18px;
+}
+
 label {
   display: block;
   color: var(--admin-primary-dark);
@@ -382,53 +407,46 @@ textarea {
   min-height: 260px;
 }
 
-.rich-source {
-  display: none;
-}
-
-.rich-editor {
+.note-editor.note-frame {
   margin-top: 7px;
-  overflow: hidden;
   border: 1px solid #d8ccc5;
   border-radius: 9px;
   background: #fff;
   transition: border .2s ease, box-shadow .2s ease;
 }
 
-.rich-editor:focus-within {
+.note-editor.note-frame:focus-within {
   border-color: var(--admin-primary);
   box-shadow: 0 0 0 4px rgba(122, 21, 56, .1);
 }
 
-.rich-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
-  border-bottom: 1px solid #eadfd7;
+.note-editor .note-toolbar {
   background: #fffaf6;
 }
 
-.rich-tool {
-  min-height: 34px;
-  padding: 7px 10px;
+.note-editor .note-btn,
+.note-editor .note-dropdown-item {
+  min-height: 32px;
+  margin: 0;
+  padding: 6px 10px;
   border: 1px solid var(--admin-border);
   border-radius: 7px;
   background: #fff;
   color: var(--admin-primary-dark);
   font-size: 13px;
-  font-weight: 850;
+  font-weight: 750;
+  box-shadow: none;
 }
 
-.rich-tool:hover,
-.rich-tool:focus-visible {
+.note-editor .note-btn:hover,
+.note-editor .note-btn:focus-visible {
   transform: none;
   background: var(--admin-primary);
   color: #fff;
   box-shadow: none;
 }
 
-.rich-panel {
+.note-editor .note-editable {
   min-height: 280px;
   padding: 14px;
   color: var(--admin-text);
@@ -436,11 +454,11 @@ textarea {
   outline: none;
 }
 
-.rich-panel h2,
-.rich-panel h3,
-.rich-panel p,
-.rich-panel ul,
-.rich-panel ol {
+.note-editor .note-editable h2,
+.note-editor .note-editable h3,
+.note-editor .note-editable p,
+.note-editor .note-editable ul,
+.note-editor .note-editable ol {
   margin-top: 0;
 }
 

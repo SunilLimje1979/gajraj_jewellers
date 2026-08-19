@@ -13,9 +13,12 @@
 				<li>Secure today’s price, save smarter. Lock today’s rate instantly and grow your digital wallet</li>
 				<li>Regulated, reliable, risk-free. Powered by SEBI/RBI-compliant providers – ensuring trust & legal safety</li>
 			</ul>
-			<div class="actions"><a class="store" href="<?= e($settings['android_url'] ?? '#') ?>"><i
-						class="fa-brands fa-google-play"></i> Play Store</a><a class="store"
-					href="<?= e($settings['ios_url'] ?? '#') ?>"><i class="fa-brands fa-apple"></i> App Store</a></div>
+			<div class="actions">
+				<?php if (($settings['android_enabled'] ?? '1') === '1'): ?><a class="store" href="<?= e(app_download_url($settings, 'android')) ?>"><i
+							class="fa-brands fa-google-play"></i> Play Store</a><?php endif; ?>
+				<?php if (($settings['ios_enabled'] ?? '1') === '1'): ?><a class="store"
+						href="<?= e(app_download_url($settings, 'ios')) ?>"><i class="fa-brands fa-apple"></i> App Store</a><?php endif; ?>
+			</div>
 		</div>
 		<div class="qr-pair"><?php if (!empty($settings['android_qr'])): ?><img
 					src="<?= upload_url($settings['android_qr']) ?>"

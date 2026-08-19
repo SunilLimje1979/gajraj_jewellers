@@ -1,0 +1,3 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+require_once APPPATH.'controllers/admin/Crud_admin.php';
+class Testimonials extends Crud_admin { protected $table='testimonials'; protected $title='Testimonials'; protected $upload_dir='uploads/testimonials'; protected $fields=array('customer_name'=>array('type'=>'text'),'review'=>array('type'=>'textarea'),'rating'=>array('type'=>'number'),'customer_image'=>array('type'=>'image','max_w'=>400,'max_h'=>400),'city'=>array('type'=>'text'),'sort_order'=>array('type'=>'number'),'status'=>array('type'=>'select','options'=>array('active','inactive'))); }

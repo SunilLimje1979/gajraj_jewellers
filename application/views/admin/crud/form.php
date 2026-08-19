@@ -9,8 +9,8 @@
                             <option value="<?= e($opt) ?>" <?= (string) $value === (string) $opt ? 'selected' : '' ?>><?= e($opt) ?>
                             </option>
                         <?php endforeach; ?>
-                    </select><?php elseif (in_array($meta['type'], array('image', 'file'), TRUE)): ?><input type="file"
-                        name="<?= $name ?>"><?php if ($value): ?><small>Current:
+                    </select><?php elseif (in_array($meta['type'], array('image', 'file', 'icon'), TRUE)): ?><input type="file"
+                        name="<?= $name ?>" <?php if ($meta['type'] === 'icon'): ?>accept=".png,.svg,.ico,image/png,image/svg+xml,image/x-icon"<?php elseif ($meta['type'] === 'image'): ?>accept="image/*"<?php elseif ($meta['type'] === 'file'): ?>accept="application/pdf"<?php endif; ?>><?php if ($value): ?><small>Current:
                             <?= e($value) ?></small><?php endif; ?><?php else: ?><input type="<?= e($meta['type']) ?>"
                         name="<?= $name ?>" value="<?= e($value) ?>"><?php endif; ?></label><?php endforeach; ?>
     </div><button class="admin-btn">Save</button>

@@ -1,72 +1,96 @@
-document.querySelectorAll('textarea.rich').forEach(function (textarea) {
-  var editor = document.createElement('div');
-  var toolbar = document.createElement('div');
-  var panel = document.createElement('div');
-  var actions = [
-    { command: 'formatBlock', value: '<h1>', label: 'H1' },
-    { command: 'formatBlock', value: '<h2>', label: 'H2' },
-    { command: 'formatBlock', value: '<h3>', label: 'H3' },
-    { command: 'formatBlock', value: '<h4>', label: 'H4' },
-    { command: 'formatBlock', value: '<h5>', label: 'H5' },
-    { command: 'formatBlock', value: '<h6>', label: 'H6' },
-    { command: 'formatBlock', value: '<p>', label: 'P' },
-    { command: 'bold', label: '<i class="fa-solid fa-bold"></i>' },
-    { command: 'italic', label: '<i class="fa-solid fa-italic"></i>' },
-    { command: 'underline', label: '<i class="fa-solid fa-underline"></i>' },
-    { command: 'insertUnorderedList', label: '<i class="fa-solid fa-list-ul"></i>' },
-    { command: 'insertOrderedList', label: '<i class="fa-solid fa-list-ol"></i>' },
-    { command: 'insertHorizontalRule', label: 'HR' },
-    { command: 'createLink', label: '<i class="fa-solid fa-link"></i>' },
-    { command: 'removeFormat', label: '<i class="fa-solid fa-eraser"></i>' }
-  ];
+(function () {
+  var allowedTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'strong', 'b', 'em', 'i', 'u', 'a', 'br', 'hr', 'blockquote'];
 
-  function syncTextarea() {
-    textarea.value = panel.innerHTML.trim();
-  }
+  function sanitizeRichHtml(html) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString('<div>' + (html || '') + '</div>', 'text/html');
 
-  function runCommand(action) {
-    panel.focus();
-    if (action.command === 'createLink') {
-      var url = window.prompt('Enter link URL');
-      if (!url) return;
-      document.execCommand(action.command, false, url);
-    } else {
-      document.execCommand(action.command, false, action.value || null);
+    function clean(node) {
+      if (node.nodeType !== 1) return;
+
+      var tag = node.tagName.toLowerCase();
+      if (['script', 'style', 'iframe', 'object', 'embed'].indexOf(tag) !== -1) {
+        node.parentNode.removeChild(node);
+        return;
+      }
+
+      if (allowedTags.indexOf(tag) === -1 && tag !== 'body' && node !== doc.body.firstChild) {
+        var parent = node.parentNode;
+        var moved = [];
+        while (node.firstChild) {
+          moved.push(node.firstChild);
+          parent.insertBefore(node.firstChild, node);
+        }
+        parent.removeChild(node);
+        moved.forEach(clean);
+        return;
+      }
+
+      var href = '';
+      if (tag === 'a') {
+        href = (node.getAttribute('href') || '').trim();
+        if (!/^(https?:|mailto:|tel:|#)/i.test(href)) href = '';
+      }
+
+      Array.prototype.slice.call(node.attributes || []).forEach(function (attr) {
+        node.removeAttribute(attr.name);
+      });
+
+      if (tag === 'a' && href) node.setAttribute('href', href);
+
+      Array.prototype.slice.call(node.childNodes).forEach(clean);
     }
-    syncTextarea();
+
+    clean(doc.body);
+    return doc.body.firstChild ? doc.body.firstChild.innerHTML.trim() : '';
   }
 
-  editor.className = 'rich-editor';
-  toolbar.className = 'rich-toolbar';
-  panel.className = 'rich-panel';
-  panel.contentEditable = 'true';
-  panel.innerHTML = textarea.value;
+  if (window.jQuery && jQuery.fn && jQuery.fn.summernote) {
+    jQuery('textarea.rich').each(function () {
+      var textarea = jQuery(this);
+      textarea.val(sanitizeRichHtml(textarea.val()));
+      textarea.summernote({
+        height: 280,
+        dialogsInBody: true,
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['bold', 'italic', 'underline', 'clear']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['insert', ['link', 'hr']],
+          ['view', ['codeview']]
+        ],
+        styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        callbacks: {
+          onPaste: function (event) {
+            var e = event.originalEvent || event;
+            var clipboard = e.clipboardData || window.clipboardData;
+            if (!clipboard) return;
 
-  actions.forEach(function (action) {
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'rich-tool';
-    button.innerHTML = action.label;
-    button.addEventListener('click', function () { runCommand(action); });
-    toolbar.appendChild(button);
-  });
+            e.preventDefault();
+            var html = clipboard.getData('text/html') || clipboard.getData('text/plain');
+            var cleanHtml = sanitizeRichHtml(html).replace(/\n/g, '<br>');
+            document.execCommand('insertHTML', false, cleanHtml);
+          },
+          onChange: function (contents) {
+            textarea.val(sanitizeRichHtml(contents));
+          }
+        }
+      });
 
-  panel.addEventListener('input', syncTextarea);
-  panel.addEventListener('blur', syncTextarea);
-  textarea.form && textarea.form.addEventListener('submit', syncTextarea);
+      textarea.closest('form').on('submit', function () {
+        textarea.summernote('code', sanitizeRichHtml(textarea.summernote('code')));
+      });
+    });
+  }
 
-  editor.appendChild(toolbar);
-  editor.appendChild(panel);
-  textarea.classList.add('rich-source');
-  textarea.insertAdjacentElement('afterend', editor);
-});
-document.querySelectorAll('[data-color-picker]').forEach(function (picker) {
-  var target = document.getElementById(picker.dataset.colorPicker);
-  if (!target) return;
-  picker.addEventListener('input', function () {
-    target.value = picker.value.toUpperCase();
+  document.querySelectorAll('[data-color-picker]').forEach(function (picker) {
+    var target = document.getElementById(picker.dataset.colorPicker);
+    if (!target) return;
+    picker.addEventListener('input', function () {
+      target.value = picker.value.toUpperCase();
+    });
+    target.addEventListener('input', function () {
+      if (/^#[0-9a-fA-F]{6}$/.test(target.value)) picker.value = target.value;
+    });
   });
-  target.addEventListener('input', function () {
-    if (/^#[0-9a-fA-F]{6}$/.test(target.value)) picker.value = target.value;
-  });
-});
+})();

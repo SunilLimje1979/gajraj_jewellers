@@ -10,7 +10,7 @@ class Home extends CI_Controller {
 		$data['gallery'] = $this->Crud_model->active('gallery', 8);
 		$data['certificates'] = $this->Crud_model->active('certificates', 4);
 		$data['testimonials'] = $this->Crud_model->active('testimonials', 6);
-		$data['faqs'] = $this->Crud_model->active('faqs', 8);
+		$data['faqs'] = $this->Crud_model->active('faqs', 5);
 		$data['trust_points'] = $this->Crud_model->active('shop_trust_points', 8);
 		$data['scheme_steps'] = $this->Crud_model->active('scheme_steps', 6);
 		$this->load->view('frontend/home', $data);

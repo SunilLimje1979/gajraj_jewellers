@@ -1,4 +1,5 @@
 <?php $s = $settings;
+$download_link = app_download_url($s);
 $title_text = isset($page->meta_title) && $page->meta_title ? $page->meta_title : $title . ' | ' . ($s['shop_name'] ?? 'Multi Gold'); ?>
 <!doctype html>
 <html lang="en">
@@ -14,7 +15,7 @@ $title_text = isset($page->meta_title) && $page->meta_title ? $page->meta_title 
 	<meta property="og:description" content="<?= e($s['meta_description'] ?? '') ?>">
 	<meta name="twitter:card" content="summary_large_image">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-	<link rel="stylesheet" href="<?= asset_url('assets/css/site.css?v=4') ?>">
+	<link rel="stylesheet" href="<?= asset_url('assets/css/site.css?v=5') ?>">
 	<style>
 		:root {
 			--primary-color: <?= e($s['primary_color'] ?? '#7a1538') ?>;
@@ -45,6 +46,6 @@ $title_text = isset($page->meta_title) && $page->meta_title ? $page->meta_title 
 		<nav class="nav">
 			<?php foreach ($menus as $m): ?><a href="<?= base_url($m->url) ?>"
 					target="<?= e($m->target) ?>"><?= e($m->label) ?></a><?php endforeach; ?>
-			<a class="btn small" href="#download">Download App</a>
+			<a class="btn small" href="<?= e($download_link) ?>">Download App</a>
 		</nav>
 	</header>
